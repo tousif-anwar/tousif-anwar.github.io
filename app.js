@@ -169,15 +169,25 @@ function selectProfile(type) {
   if (transitioning) return;
   setProfile(type);
   window.scrollTo({ top: 0, behavior: 'instant' });
-  if (!motionOn) { finishIntro(); return; }
+  enterApp();
+  if (linkedSection && $('#app').contains(linkedSection)) requestAnimationFrame(() => linkedSection.scrollIntoView({ behavior: 'instant' }));
+}
+
+function startIntro() {
   clearIntroPlayback();
   transitioning = true;
+  $('#app').inert = true;
+  $('#app').setAttribute('aria-hidden', 'true');
+  $('#app').classList.remove('visible');
+  appEntered = false;
   $('#profiles').hidden = true;
   $('#profiles').inert = true;
   $('#intro').hidden = false;
   $('#intro').classList.remove('playing', 'leaving');
   document.body.classList.add('intro-playing');
+  syncCanvas();
   $('#skipIntro').focus({ preventScroll: true });
+  if (!motionOn) { finishIntro(); return; }
   prepareIntro(introSequence);
 }
 
@@ -198,8 +208,13 @@ function enterApp() {
 function finishIntro() {
   clearIntroPlayback();
   const hasIntro = !$('#intro').hidden;
-  enterApp();
   transitioning = false;
+  appEntered = false;
+  $('#profiles').hidden = false;
+  $('#profiles').inert = false;
+  $('#profiles').classList.remove('exit');
+  document.body.classList.add('choosing-profile');
+  $('button[data-profile="visitor"]').focus({ preventScroll: true });
   if (hasIntro && motionOn) {
     $('#intro').classList.add('leaving');
     introExitTimer = window.setTimeout(hideIntro, 360);
@@ -219,7 +234,7 @@ function switchProfile() {
   $('#profiles').classList.remove('exit');
   document.body.classList.add('choosing-profile');
   window.scrollTo({ top: 0, behavior: 'instant' });
-  $(`[data-profile="${activeProfile}"]`).focus({ preventScroll: true });
+  $(`button[data-profile="${activeProfile}"]`).focus({ preventScroll: true });
   syncCanvas();
 }
 
@@ -579,7 +594,7 @@ $('#intro').addEventListener('animationend', event => {
 $('#switchProfile').addEventListener('click', switchProfile);
 $('#replayIntro').addEventListener('click', () => {
   if (!motionOn) { toast('Turn motion on to replay the cinematic intro'); return; }
-  switchProfile(); selectProfile(activeProfile);
+  startIntro();
 });
 $('#motionToggle').addEventListener('click', () => { motionOn = !motionOn; storage.write('devflix-motion', motionOn); applyMotion(); });
 motionPreference.addEventListener('change', event => { motionOn = !event.matches && storage.read('devflix-motion', true) !== false; applyMotion(); });
@@ -673,10 +688,9 @@ applyMotion();
 updateSaved();
 activityObserver.observe($('#home'));
 measureSections();
-// Direct section links bypass the opening screen and stay shareable.
+// Every visit starts with the intro, then profile selection. Follow section links after selection.
 const linkedSection = document.getElementById(location.hash.slice(1));
-if (linkedSection && $('#app').contains(linkedSection)) { setProfile('visitor'); finishIntro(); requestAnimationFrame(() => linkedSection.scrollIntoView({ behavior: 'instant' })); }
-else { setProfile('visitor'); finishIntro(); }
+startIntro();
 
 function projectRepository(id) {
   const value = window.portfolioProjectLinks?.[id];
