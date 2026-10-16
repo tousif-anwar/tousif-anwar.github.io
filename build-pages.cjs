@@ -42,7 +42,11 @@ for(const [key,[file,label]] of Object.entries(pages)){
     section.prepend(breadcrumb);
     $('#profiles').hidden=true;$('#intro').hidden=true;document.body.classList.remove('choosing-profile');
     $('#app').classList.add('visible');
-    if(key==='experience')section.querySelector('.section-description').textContent='The roles are listed from most recent to earliest. Some dates overlap: Walmart was an internship during the broader Clear One Advantage period. The details below preserve the dates supplied in my résumé.';
+    if(key==='experience') {
+      section.querySelector('.section-description').textContent='The roles are listed from most recent to earliest. Some dates overlap: Walmart was an internship during the broader Clear One Advantage period. The details below preserve the dates supplied in my résumé.';
+      section.querySelector('.experience-row').setAttribute('aria-label','Professional roles, most recent first');
+      for(const item of section.querySelectorAll('.page-breadcrumb,.page-introduction')) { item.style.marginLeft='var(--gutter)'; item.style.marginRight='var(--gutter)'; }
+    }
     if(key==='skills')section.querySelector('.section-description').textContent='Choose a technology to see how it fits into my work. Related role links open the detailed career story; skill names are not proficiency ratings or certifications.';
     if(key==='blog'){
       $('#blogEmptyTitle').textContent='No articles published yet.';
