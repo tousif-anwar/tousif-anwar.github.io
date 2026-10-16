@@ -1,0 +1,150 @@
+[
+  {
+    "name": "python",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/master/icons/python/python-original.svg"
+  },
+  {
+    "name": "java",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/master/icons/java/java-original.svg"
+  },
+  {
+    "name": "javascript",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/master/icons/javascript/javascript-original.svg"
+  },
+  {
+    "name": "typescript",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/master/icons/typescript/typescript-original.svg"
+  },
+  {
+    "name": "bash",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/master/icons/bash/bash-original.svg"
+  },
+  {
+    "name": "c",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/master/icons/c/c-original.svg"
+  },
+  {
+    "name": "cplusplus",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/master/icons/cplusplus/cplusplus-original.svg"
+  },
+  {
+    "name": "csharp",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/master/icons/csharp/csharp-original.svg"
+  },
+  {
+    "name": "rust",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/master/icons/rust/rust-original.svg"
+  },
+  {
+    "name": "go",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/master/icons/go/go-original.svg"
+  },
+  {
+    "name": "latex",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/master/icons/latex/latex-original.svg"
+  },
+  {
+    "name": "amazonwebservices",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/master/icons/amazonwebservices/amazonwebservices-original-wordmark.svg"
+  },
+  {
+    "name": "cassandra",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/master/icons/cassandra/cassandra-original.svg"
+  },
+  {
+    "name": "googlecloud",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/master/icons/googlecloud/googlecloud-original.svg"
+  },
+  {
+    "name": "firebase",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/master/icons/firebase/firebase-original.svg"
+  },
+  {
+    "name": "azure",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/master/icons/azure/azure-original.svg"
+  },
+  {
+    "name": "apache",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/master/icons/apache/apache-original.svg"
+  },
+  {
+    "name": "postgresql",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/master/icons/postgresql/postgresql-original.svg"
+  },
+  {
+    "name": "mysql",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/master/icons/mysql/mysql-original.svg"
+  },
+  {
+    "name": "mongodb",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/master/icons/mongodb/mongodb-original.svg"
+  },
+  {
+    "name": "cosmosdb",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/master/icons/cosmosdb/cosmosdb-original.svg"
+  },
+  {
+    "name": "pytorch",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/master/icons/pytorch/pytorch-original.svg"
+  },
+  {
+    "name": "apachespark",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/master/icons/apachespark/apachespark-original.svg"
+  },
+  {
+    "name": "react",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/master/icons/react/react-original.svg"
+  },
+  {
+    "name": "nodejs",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/master/icons/nodejs/nodejs-original.svg"
+  },
+  {
+    "name": "spring",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/master/icons/spring/spring-original.svg"
+  },
+  {
+    "name": "dotnetcore",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/master/icons/dotnetcore/dotnetcore-original.svg"
+  },
+  {
+    "name": "vuejs",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/master/icons/vuejs/vuejs-original.svg"
+  },
+  {
+    "name": "apple",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/master/icons/apple/apple-original.svg"
+  },
+  {
+    "name": "android",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/master/icons/android/android-original.svg"
+  },
+  {
+    "name": "git",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/master/icons/git/git-original.svg"
+  },
+  {
+    "name": "docker",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/master/icons/docker/docker-original.svg"
+  },
+  {
+    "name": "kubernetes",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/master/icons/kubernetes/kubernetes-original.svg"
+  },
+  {
+    "name": "linux",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/master/icons/linux/linux-original.svg"
+  },
+  {
+    "name": "windows11",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/master/icons/windows11/windows11-original.svg"
+  },
+  {
+    "name": "sentry",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/master/icons/sentry/sentry-original.svg"
+  },
+  {
+    "name": "jira",
+    "source": "https://raw.githubusercontent.com/devicons/devicon/master/icons/jira/jira-original.svg"
+  }
+]
