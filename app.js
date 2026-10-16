@@ -89,7 +89,7 @@ const story = [
 
 let activeProfile = 'visitor';
 const currentPage = document.body.dataset.page || 'home';
-const pageFiles = {home:'index.html',projects:'projects.html',experience:'experience.html',skills:'skills.html',about:'about.html',videos:'videos.html',blog:'blog.html',contact:'contact.html'};
+const pageFiles = {home:'index.html',projects:'projects.html',experience:'experience.html',skills:'skills.html',about:'about.html',videos:'projects.html',blog:'blog.html',contact:'contact.html'};
 function visitPage(section, query = '') {
   const key = section.replace(/^#/, '');
   if (pageFiles[key]) window.location.href = pageFiles[key] + query;
@@ -288,11 +288,13 @@ function filterProjects() {
     if (visible) { count++; if (appEntered) revealObserver.observe(card); }
   });
   $('#emptyProjects').hidden = count > 0;
+  document.dispatchEvent(new CustomEvent('portfolio:project-filter'));
 }
 
 function openDialog(dialog) {
   dialog.showModal();
   document.body.classList.add('modal-open');
+  document.dispatchEvent(new CustomEvent('portfolio:modal'));
   syncCanvas();
 }
 
@@ -320,6 +322,7 @@ function showDetail(id) {
     section.append(h3, p); return section;
   }));
   const art = $(`.project-card[data-id="${id}"] .project-art`).cloneNode(true);
+  art.hidden = false;
   art.removeAttribute('data-detail');
   art.removeAttribute('aria-label');
   art.tabIndex = -1;
@@ -608,6 +611,17 @@ $('#intro').addEventListener('animationend', event => {
   if (event.target === $('#intro') && event.animationName === 'introDissolve') hideIntro();
 });
 $('#switchProfile').addEventListener('click', switchProfile);
+const mobileMenuButton = $('#mobileMenuToggle');
+function setMobileMenu(open, restoreFocus = false) {
+  $('#navbar').classList.toggle('menu-open', open);
+  mobileMenuButton?.setAttribute('aria-expanded', String(open));
+  mobileMenuButton?.setAttribute('aria-label', open ? 'Close navigation menu' : 'Open navigation menu');
+  if(restoreFocus)mobileMenuButton?.focus({preventScroll:true});
+}
+mobileMenuButton?.addEventListener('click',()=>setMobileMenu(mobileMenuButton.getAttribute('aria-expanded')!=='true'));
+$('.nav-links').addEventListener('click',event=>{if(event.target.closest('a'))setMobileMenu(false);});
+document.addEventListener('click',event=>{if(mobileMenuButton?.getAttribute('aria-expanded')==='true'&&!event.target.closest('#navbar'))setMobileMenu(false);});
+document.addEventListener('keydown',event=>{if(event.key==='Escape'&&mobileMenuButton?.getAttribute('aria-expanded')==='true'){setMobileMenu(false,true);}});
 $('#replayIntro').addEventListener('click', () => {
   if (!motionOn) { toast('Turn motion on to replay the cinematic intro'); return; }
   startIntro();
@@ -729,7 +743,10 @@ $$('.project-card').forEach(card => {
   const id = card.dataset.id;
   const actions = document.createElement('div'); actions.className = 'project-quick-actions';
   const watch = document.createElement('button'); watch.type = 'button'; watch.textContent = 'Watch explainer'; watch.dataset.projectVideo = id;
-  watch.addEventListener('click', () => window.portfolioJournal?.showProjectVideo(id));
+  watch.addEventListener('click', () => {
+    if(currentPage==='projects')window.portfolioJournal?.playCardVideo(id);
+    else visitPage('projects',`?project=${encodeURIComponent(id)}`);
+  });
   const source = document.createElement('a'); const repo = projectRepository(id);
   source.href = repo || 'https://github.com/tousif-anwar?tab=repositories'; source.target = '_blank'; source.rel = 'noopener noreferrer';
   source.textContent = repo ? 'GitHub repository ↗' : 'Browse GitHub ↗';

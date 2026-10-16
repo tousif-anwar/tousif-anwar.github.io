@@ -27,6 +27,7 @@
     if (/\.(?:mp4|webm)(?:\?.*)?$/i.test(safe)) return { type: 'file', src: safe };
     if (safe.startsWith('assets/')) return null;
     const url = new URL(safe);
+    if (['scrimba.com','www.scrimba.com'].includes(url.hostname) && /^\/explain\/guide[a-z0-9]+\/?$/.test(url.pathname)) return {type:'embed',src:`https://scrimba.com${url.pathname.replace(/\/$/,'')}`,label:'Scrimba'};
     let id = '';
     if (url.hostname === 'youtu.be') id = url.pathname.slice(1);
     if (['youtube.com', 'www.youtube.com', 'm.youtube.com'].includes(url.hostname)) id = url.searchParams.get('v') || url.pathname.match(/^\/(?:embed|shorts)\/([^/]+)/)?.[1] || '';
@@ -85,7 +86,7 @@
     state.videos = (Array.isArray(videos) ? videos : []).filter(validPublished).filter(video => video.project !== 'overview' && videoSource(video.url)).sort((a,b) => Date.parse(b.publishedAt) - Date.parse(a.publishedAt));
     const categories = [...new Set(state.posts.map(post => post.category || 'Engineering'))].sort();
     find('#blogCategory').replaceChildren(...['all', ...categories].map(category => { const option = create('option', category === 'all' ? 'All topics' : category); option.value = category; return option; }));
-    renderPosts(); renderVideos();
+    renderPosts(); renderVideos(); renderProjectVideos();
     doc.dispatchEvent(new CustomEvent('portfolio:content', { detail: { posts: state.posts, videos: state.videos } }));
     const requestedSlug = new URLSearchParams(window.location.search || '').get('post');
     if (requestedSlug) showPost(requestedSlug);
@@ -152,6 +153,47 @@
     const distance = rail.firstElementChild.getBoundingClientRect().width + 16;
     rail.scrollBy({ left: direction * distance, behavior: doc.body.classList.contains('motion-off') || window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
   }
+  let activeCardStop = null;
+  const cardPlayers = new Map();
+  function stopCardPlayback() { if(activeCardStop){const stop=activeCardStop;activeCardStop=null;stop();} }
+  function renderProjectVideos() {
+    stopCardPlayback(); cardPlayers.clear();
+    for(const card of doc.querySelectorAll('.project-card')) {
+      card.querySelector('.project-media')?.remove();
+      const art=card.querySelector('.project-art'); art.hidden=false;
+      const video = state.videos.find(item=>item.project===card.dataset.id);
+      if(!video) continue;
+      art.hidden=true;
+      const media=create('div',undefined,'project-media');
+      const preview=create('button',undefined,'project-video-preview'); preview.type='button';
+      preview.setAttribute('aria-label',`Play walkthrough: ${video.title}`);
+      const poster=safeUrl(video.poster,true);
+      if(poster){const img=create('img');img.src=poster;img.alt='';img.width=960;img.height=540;img.loading='lazy';img.decoding='async';preview.append(img);}
+      preview.append(create('span','▶','walkthrough-play'),create('span',`Play walkthrough · ${video.duration || 'Project video'}`,'project-video-label'));
+      const stage=create('div',undefined,'project-video-stage');stage.append(preview);
+      const controls=create('div',undefined,'project-video-controls');
+      const summary=create('details',undefined,'project-card-summary');summary.append(create('summary','Read video summary'));
+      const body=create('div');renderBody(body,video.summary||video.description||'');summary.append(body);
+      const close=create('button','Close player','project-player-close');close.type='button';close.hidden=true;
+      const fallback=create('a','Open video ↗');fallback.href=video.url;fallback.target='_blank';fallback.rel='noopener noreferrer';
+      controls.append(summary,close,fallback);media.append(stage,controls);art.after(media);
+      const stop=()=>{stage.replaceChildren(preview);close.hidden=true;media.classList.remove('is-playing');};
+      close.addEventListener('click',()=>{stopCardPlayback();preview.focus();});
+      const play=()=>{
+        stopCardPlayback();const source=videoSource(video.url);if(!source)return;
+        let player;
+        if(source.type==='embed'){player=create('iframe');player.src=source.src;player.title=`${video.title} — narrated walkthrough`;player.allow='autoplay; fullscreen; encrypted-media; picture-in-picture';player.allowFullscreen=true;player.referrerPolicy='strict-origin-when-cross-origin';}
+        else if(source.type==='file'){player=create('video');player.src=source.src;player.controls=true;player.playsInline=true;player.preload='metadata';}
+        else {window.open(source.src,'_blank','noopener,noreferrer');return;}
+        stage.replaceChildren(player);close.hidden=false;media.classList.add('is-playing');activeCardStop=stop;player.focus();
+      };
+      preview.addEventListener('click',play);cardPlayers.set(card.dataset.id,play);
+    }
+  }
+  doc.addEventListener('portfolio:play-project',event=>cardPlayers.get(event.detail?.id)?.());
+  doc.addEventListener('portfolio:modal',stopCardPlayback);
+  doc.addEventListener('portfolio:project-filter',stopCardPlayback);
+  doc.addEventListener('visibilitychange',()=>{if(doc.hidden)stopCardPlayback();});
   find('#heroVideoPrev')?.addEventListener('click', () => scrollHeroVideos(-1));
   find('#heroVideoNext')?.addEventListener('click', () => scrollHeroVideos(1));
   find('#heroVideoRail')?.addEventListener('keydown', event => {
@@ -224,7 +266,8 @@
   // Narrow testing/embedding API; no write credentials or browser-side publishing.
   window.portfolioJournal = Object.freeze({ showPost, videoSource, safeUrl, renderBody, refresh: loadRemote,
     hasVideo: id => state.videos.some(video => video.project === id),
-    showProjectVideo: id => { const video = state.videos.find(item => item.project === id); if (video) showVideo(video); }
+    showProjectVideo: id => { const video = state.videos.find(item => item.project === id); if (video) showVideo(video); },
+    playCardVideo: id => cardPlayers.get(id)?.()
   });
   loadRemote();
 })();

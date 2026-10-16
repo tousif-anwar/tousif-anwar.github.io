@@ -16,12 +16,17 @@ const copy={
 };
 for(const [key,[file,label]] of Object.entries(pages)){
   const {document}=parseHTML(template); const $=s=>document.querySelector(s);
+  $('.nav-links a[href="#videos"]')?.remove();
+  $('.nav-links').id='portfolioMenu';
+  const menuButton=document.createElement('button');menuButton.type='button';menuButton.id='mobileMenuToggle';menuButton.className='mobile-menu-toggle';menuButton.setAttribute('aria-label','Open navigation menu');menuButton.setAttribute('aria-controls','portfolioMenu');menuButton.setAttribute('aria-expanded','false');menuButton.innerHTML='<span aria-hidden="true"><i></i><i></i><i></i></span><span>Menu</span>';
+  $('#navbar').prepend(menuButton);
   document.body.dataset.page=key;
   document.title=key==='home'?'Tousif Anwar | Software Engineer':`${label} | Tousif Anwar`;
   const meta=$('meta[name="description"]');if(copy[key])meta.content=copy[key].intro;
   for(const link of document.querySelectorAll('a[href^="#"]')){
     const id=link.getAttribute('href').slice(1);if(!pages[id])continue;
-    link.href=pages[id][0];
+    link.href=id==='videos'?'projects.html':pages[id][0];
+    if(id==='videos')link.textContent='View project walkthroughs';
     if(link.closest('.nav-links')){link.dataset.section=id;link.classList.toggle('active',id===key);if(id===key)link.setAttribute('aria-current','page');else link.removeAttribute('aria-current');}
   }
   $('.skip-link').href=`#${key}`;
@@ -55,6 +60,10 @@ for(const [key,[file,label]] of Object.entries(pages)){
     }
     if(key==='contact')section.querySelector('.contact-content>p:not(.overline):not(.page-introduction)').textContent='For a useful first message, include the role or project, the engineering problem, and the best way to reach you. I am based in Philadelphia, Pennsylvania.';
   }
+  if(key==='projects') {
+    $('.page-introduction').textContent='Explore six projects across applied AI, computer vision, data engineering, and application development. Play the narrated walkthrough in each card, read its written summary, or open the case study for the problem, my contribution, and the confirmed scope or results.';
+    $('.project-reading-guide').textContent='Select Play walkthrough to load the video inside its card. Only one card plays at a time. Close player stops playback; fullscreen and captions are available in the embedded player.';
+  }
   $('#app').append(scaffold);
   // Specific, readable descriptions on every project card.
   const descriptions={mortgage:'Freelance architecture work on agent runtime, contextual reasoning, and orchestration between conversations and downstream loan workflows.',vision:'Drexel Vision Lab research using PyTorch to compare low-light enhancement with pedestrian detection performance, including preprocessing, augmentation, training, and evaluation.',disaster:'An academic system connecting reinforcement learning-driven drone navigation, mission and sensor data, and LLM-based recovery reporting. This was not an operational emergency deployment.',intelligence:'JPMorgan Chase work on Python and PySpark ETL pipelines, automated data checks, and migration of 25 datasets totaling 40 TB to AWS and Apache Iceberg.',fullstack:'A personal application project spanning interface, server logic, and data. The current case study outlines the scope; repository-specific features and architecture will be added with the source link.',recsys:'A personal project exploring relevant-item discovery. Dataset, ranking method, architecture, and evaluation results are not yet documented; the case study introduces the problem and intended scope.'};
@@ -62,8 +71,8 @@ for(const [key,[file,label]] of Object.entries(pages)){
   const clearHeadings={projects:'Engineering projects and case studies',experience:'Professional experience',skills:'Technical skills and where I use them',about:'About Tousif Anwar',videos:'Project explainer videos',blog:'Engineering notes and project write-ups',contact:'Contact Tousif Anwar'};
   for(const [id,title] of Object.entries(clearHeadings)){const heading=$(`#${id} h2`);if(heading)heading.textContent=title;}
   const about=$('.about-lead');about.textContent='I build backend and data systems, integrate mobile applications with APIs, and investigate applied machine learning problems. My work connects software delivery with production performance and reliability.';
-  for(const asset of document.querySelectorAll('script[src],link[rel="stylesheet"]')){const attr=asset.tagName==='SCRIPT'?'src':'href';asset.setAttribute(attr,asset.getAttribute(attr).split('?')[0]+'?v=pages-20261016');}
+  for(const asset of document.querySelectorAll('script[src],link[rel="stylesheet"]')){const attr=asset.tagName==='SCRIPT'?'src':'href';asset.setAttribute(attr,asset.getAttribute(attr).split('?')[0]+'?v=cards-menu-20261016');}
   const canonical=document.createElement('link');canonical.rel='canonical';canonical.href='https://tousif-anwar.github.io/'+(key==='home'?'':file);document.head.append(canonical);
-  fs.writeFileSync(file,document.toString());
+  fs.writeFileSync(file,key==='videos'?'<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta http-equiv="refresh" content="0;url=projects.html"><link rel="canonical" href="https://tousif-anwar.github.io/projects.html"><title>Project walkthroughs | Tousif Anwar</title></head><body><p>Walkthroughs now appear inside the project cards. <a href="projects.html">View projects and videos</a>.</p></body></html>':document.toString());
 }
 console.log('Built eight standalone portfolio pages.');
