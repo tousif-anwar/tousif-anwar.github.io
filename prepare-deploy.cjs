@@ -1,0 +1,14 @@
+'use strict';
+const fs = require('node:fs');
+const path = require('node:path');
+const root = __dirname;
+const output = path.join(root, 'deploy');
+require('./build-pages.cjs');
+const files = ['index.html','projects.html','experience.html','skills.html','about.html','videos.html','blog.html','contact.html','styles.css','app.js','portfolio-data.js','project-links.js','publishing-config.js','publishing.js','favicon.svg','resume.pdf'];
+fs.mkdirSync(output, { recursive: true });
+for (const name of files) fs.copyFileSync(path.join(root,name), path.join(output,name));
+fs.cpSync(path.join(root,'assets'), path.join(output,'assets'), { recursive: true });
+fs.mkdirSync(path.join(output,'admin'), { recursive:true });
+for(const name of ['index.html','studio-link.js']) fs.copyFileSync(path.join(root,'admin',name), path.join(output,'admin',name));
+fs.writeFileSync(path.join(output,'.nojekyll'),'');
+console.log(`Deployment folder prepared: ${output}\nIncludes public site files only. Review drafts, studio sources, test dependencies, and local environment files are excluded.\nUpload this deploy folder to the static host. Hosted publishing still requires the Sanity project connection.`);

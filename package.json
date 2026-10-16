@@ -1,0 +1,12 @@
+{
+  "name": "tousif-anwar-portfolio",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "build": "node build-pages.cjs",
+    "package:site": "node prepare-deploy.cjs"
+  },
+  "devDependencies": {
+    "linkedom": "0.18.13"
+  }
+}

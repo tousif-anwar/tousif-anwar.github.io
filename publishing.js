@@ -105,8 +105,8 @@
       card.append(meta, title, excerpt, footer); return card;
     }));
     find('#blogEmpty').hidden = posts.length > 0;
-    find('#blogEmptyTitle').textContent = state.posts.length ? 'No stories match this search.' : 'The next chapter is being written.';
-    find('#blogEmptyText').textContent = state.posts.length ? 'Try another topic or a different search.' : 'Engineering walkthroughs, project lessons, and notes from behind the systems. Coming here as I publish.';
+    find('#blogEmptyTitle').textContent = state.posts.length ? 'No articles match this search.' : 'No articles published yet.';
+    find('#blogEmptyText').textContent = state.posts.length ? 'Clear the search or select another topic to see more articles.' : 'Browse the project case studies and written video summaries while the article collection is being prepared.';
     find('#blogResultCount').textContent = `${posts.length} ${posts.length === 1 ? 'story' : 'stories'}`;
   }
   function renderVideos() {
@@ -168,7 +168,7 @@
     find('#postTitle').textContent = post.title;
     find('#postMeta').textContent = `${post.category || 'Engineering'} · ${formattedDate(post.publishedAt)} · ${readingTime(post.body)} min read`;
     find('#postExcerpt').textContent = post.excerpt || '';
-    try { const url = new URL(window.location.href); url.searchParams.set('post', slug); url.hash = 'blog'; find('#postPermalink').href = url.href; } catch { find('#postPermalink').href = '#blog'; }
+    try { const url = new URL('blog.html', window.location.href); url.searchParams.set('post', slug); find('#postPermalink').href = url.href; } catch { find('#postPermalink').href = 'blog.html'; }
     renderBody(find('#postBody'), post.body);
     openDialog(find('#postDialog')); find('#postDialog').scrollTop = 0;
     return true;
@@ -186,6 +186,7 @@
     caseStudy.hidden = !projectLabels[video.project] || video.project === 'overview';
     caseStudy.onclick = () => {
       find('#videoDialog').close();
+      if (doc.body.dataset.page && doc.body.dataset.page !== 'projects') { window.location.href = `projects.html?project=${encodeURIComponent(video.project)}`; return; }
       doc.dispatchEvent(new CustomEvent('portfolio:project-detail', { detail: { id: video.project } }));
     };
     if (source.type === 'file') {

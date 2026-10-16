@@ -20,7 +20,7 @@ const projects = {
       ['The challenge', 'Mortgage origination moves through conversations, data capture, decisions, and downstream processing. Fragmented workflows make that handoff harder. This freelance architecture work brings those stages into a coordinated sales pipeline.'],
       ['The engineering', 'Architected an AI-powered platform with agent runtime and cognition systems for contextual reasoning and task execution. Built orchestration infrastructure that connects multi-channel inputs with downstream workflows, using LLM application design and distributed systems principles.'],
       ['My contribution', 'Software architecture, agent runtime design, workflow orchestration, and integration of conversational inputs with processing systems.'],
-      ['The focus', 'Scalable, resilient automation that keeps context moving with the work. A look at applied AI as part of an operating system for a business—not just a standalone chat interface.']
+      ['Scope and evidence', 'This case study describes freelance architecture and integration work across agent execution, contextual reasoning, and workflow orchestration. Client-specific implementation details, production volumes, and performance measurements are not published here.']
     ]
   },
   vision: {
@@ -61,10 +61,10 @@ const projects = {
     lead: 'A personal application project spanning the user interface, server-side logic, and data layer.',
     tags: ['Full-stack development', 'Frontend', 'Backend', 'Application design'],
     sections: [
-      ['The project', 'A full-stack application in my project collection, bringing client-side and server-side development into the same product experience.'],
+      ['Documented scope', 'The personal project covers a user interface, server-side application logic, and a data layer. Its repository, product features, implementation stack, and deployment details have not yet been added to this case study.'],
       ['The engineering perspective', 'My professional full-stack work informs how I approach applications: define clear client–server contracts, handle failures explicitly, and think about the path from implementation to release.'],
       ['Connected experience', 'At Clear One Advantage, I co-defined REST contracts and built authenticated integrations across 15 screens. At Walmart, I contributed features across React, Node.js, Spring Boot, Cosmos DB, and Docker.'],
-      ['Explore further', 'Explore more of my work on GitHub, or start a conversation about the engineering behind the project.']
+      ['Source and next steps', 'The repository link will be added when it is available. Until then, the GitHub action opens my public repository list. The professional examples above describe separate employment work and do not establish the technology choices of this personal project.']
     ]
   },
   recsys: {
@@ -72,7 +72,7 @@ const projects = {
     lead: 'Exploring how software helps people discover something relevant in a collection of choices.',
     tags: ['Recommendation systems', 'Discovery', 'Machine learning'],
     sections: [
-      ['The project', 'A recommendation-system project in my collection, focused on the problem of connecting people with relevant items.'],
+      ['Documented scope', 'This personal project concerns relevant-item discovery. The portfolio does not yet document its dataset, retrieval or ranking algorithm, serving architecture, or evaluation results. The video is a conceptual introduction rather than an implementation demonstration.'],
       ['The question', 'How should a system decide what is useful to recommend? This project sits at the intersection of data, machine learning, and product discovery.'],
       ['Connected interests', 'My broader AI toolkit includes PyTorch, LLM fine-tuning, RAG, and Spark. My computer vision research at Drexel also informs my interest in evaluating models against the task they support.'],
       ['What I care about', 'Recommendations should help someone make a useful next choice. That product question is what makes recommendation systems interesting to me—not just the model, but the experience around it.']
@@ -88,6 +88,12 @@ const story = [
 ];
 
 let activeProfile = 'visitor';
+const currentPage = document.body.dataset.page || 'home';
+const pageFiles = {home:'index.html',projects:'projects.html',experience:'experience.html',skills:'skills.html',about:'about.html',videos:'videos.html',blog:'blog.html',contact:'contact.html'};
+function visitPage(section, query = '') {
+  const key = section.replace(/^#/, '');
+  if (pageFiles[key]) window.location.href = pageFiles[key] + query;
+}
 let appEntered = false;
 let transitioning = false;
 let introTimer = 0;
@@ -148,18 +154,21 @@ async function prepareIntro(sequence) {
 
 function setProfile(type) {
   activeProfile = type === 'recruiter' ? 'recruiter' : 'visitor';
+  storage.write('portfolio-profile', activeProfile);
   document.body.dataset.profile = activeProfile;
   $('#miniAvatar').classList.toggle('recruiter', activeProfile === 'recruiter');
   $('#switchProfile').setAttribute('aria-label', `Switch viewing profile, currently ${activeProfile}`);
   $('#heroDescription').textContent = activeProfile === 'recruiter'
     ? "I'm Tousif Anwar, a software engineer across backend systems, cloud data platforms, and mobile products. My work spans 40 TB of data at JPMorgan Chase, an app serving 5,000 users, and full-stack delivery at Walmart."
-    : "I'm Tousif Anwar. I connect the business problem to the engineering behind it—from Python and PySpark data platforms to mobile experiences, full-stack applications, and AI.";
+    : "I'm Tousif Anwar. I build Python and PySpark data pipelines, integrate mobile applications with REST APIs, and develop applied AI systems. My experience includes AWS and Iceberg data modernization, React Native delivery for iOS and Android, and computer vision research at Drexel.";
   const main = $('#app main');
   const experience = $('#experience');
   const projectsSection = $('#projects');
   // Both profiles retain the full portfolio, while the first collection reflects their intent.
-  if (activeProfile === 'recruiter') main.insertBefore(experience, projectsSection);
-  else main.insertBefore(projectsSection, experience);
+  if (!document.body.dataset.page) {
+    if (activeProfile === 'recruiter') main.insertBefore(experience, projectsSection);
+    else main.insertBefore(projectsSection, experience);
+  }
   projectsSection.classList.toggle('projects-section', activeProfile === 'visitor');
   experience.classList.toggle('first-collection', activeProfile === 'recruiter');
   measureSections();
@@ -169,8 +178,9 @@ function selectProfile(type) {
   if (transitioning) return;
   setProfile(type);
   window.scrollTo({ top: 0, behavior: 'instant' });
+  if (document.body.dataset.page === 'home' && activeProfile === 'recruiter') { visitPage('experience'); return; }
   enterApp();
-  if (linkedSection && $('#app').contains(linkedSection)) requestAnimationFrame(() => linkedSection.scrollIntoView({ behavior: 'instant' }));
+  if (linkedSection && linkedSection.id !== currentPage) visitPage(linkedSection.id);
 }
 
 function startIntro() {
@@ -200,7 +210,8 @@ function enterApp() {
   document.body.classList.remove('choosing-profile');
   appEntered = true;
   $$('.reveal').forEach(el => revealObserver.observe(el));
-  $('.nav-links a[href="#home"]').focus({ preventScroll: true });
+  const heading = $(`#${currentPage} h1`) || $('.nav-links a');
+  heading?.focus({ preventScroll: true });
   updateScroll();
   syncCanvas();
 }
@@ -288,6 +299,7 @@ function openDialog(dialog) {
 function showDetail(id) {
   const item = projects[id];
   if (!item) return;
+  if (document.body.dataset.page && currentPage !== 'projects') { visitPage('projects', `?project=${encodeURIComponent(id)}`); return; }
   if ($('#searchDialog').open) $('#searchDialog').close();
   currentProject = id;
   $('#modalTitle').textContent = item.title;
@@ -430,10 +442,10 @@ function renderSearch() {
     const category = document.createElement('small'); category.textContent = item.category; text.append(title, category);
     const arrow = document.createElement('span'); arrow.textContent = '↗'; button.append(text, arrow);
     button.addEventListener('click', () => {
-      if (item.journalPost) { $('#searchDialog').close(); window.portfolioJournal?.showPost(item.journalPost); }
+      if (item.journalPost) { $('#searchDialog').close(); visitPage('blog', `?post=${encodeURIComponent(item.journalPost)}`); }
       else if (item.career) showCareer(item.career);
       else if (item.id) showDetail(item.id);
-      else { $('#searchDialog').close(); $(item.section).scrollIntoView({ behavior: motionOn ? 'smooth' : 'instant', block: 'start' }); }
+      else { $('#searchDialog').close(); visitPage(item.section); }
     });
     $('#searchResults').append(button);
   });
@@ -562,11 +574,11 @@ function syncCanvas() {
   canvas.classList.toggle('is-animating', motionOn && appEntered && heroInView && !document.hidden && !document.body.classList.contains('modal-open') && !document.body.classList.contains('intro-playing'));
 }
 
-const navItems = $$('.nav-links a').map(link => ({ link, section: $(link.getAttribute('href')) }));
+const navItems = $$('.nav-links a').map(link => ({ link, section: document.getElementById(link.dataset.section || link.getAttribute('href').replace(/^#/,'')) })).filter(item=>item.section);
 let sectionPositions = [];
 let currentNavSection = '';
 function measureSections() {
-  sectionPositions = navItems.map(item => ({ ...item, top: item.section.getBoundingClientRect().top + window.scrollY })).sort((a, b) => a.top - b.top);
+  sectionPositions = navItems.filter(item=>!item.section.hidden).map(item => ({ ...item, top: item.section.getBoundingClientRect().top + window.scrollY })).sort((a, b) => a.top - b.top);
 }
 
 let scrollScheduled = false;
@@ -574,16 +586,16 @@ function updateScroll() {
   // Read geometry before changing styles, avoiding forced layout during scrolling.
   const y = window.scrollY;
   const total = document.documentElement.scrollHeight - window.innerHeight;
-  let active = '#home';
+  let active = `#${currentPage}`;
   sectionPositions.forEach(item => {
-    if (item.top <= y + window.innerHeight * .35) active = `#${item.section.id}`;
+    if (!document.body.dataset.page && item.top <= y + window.innerHeight * .35) active = `#${item.section.id}`;
   });
   $('#navbar').classList.toggle('scrolled', y > 25);
   $('#scrollProgress').style.transform = `scaleX(${total > 0 ? Math.min(y / total, 1) : 0})`;
   if (active !== currentNavSection) navItems.forEach(({ link }) => {
-    const isActive = link.getAttribute('href') === active;
+    const isActive = (link.dataset.section || link.getAttribute('href').replace(/^#/,'')) === active.slice(1);
     link.classList.toggle('active', isActive);
-    if (isActive) link.setAttribute('aria-current', 'location'); else link.removeAttribute('aria-current');
+    if (isActive) link.setAttribute('aria-current', document.body.dataset.page ? 'page' : 'location'); else link.removeAttribute('aria-current');
   });
   currentNavSection = active;
   scrollScheduled = false;
@@ -622,8 +634,9 @@ document.addEventListener('click', event => {
   if (careerButton) { showCareer(careerButton.dataset.career); return; }
   const jump = event.target.closest('[data-skill-jump]');
   if (jump) {
-    $('#careerDialog').close(); resetSkills(); selectSkill(jump.dataset.skillJump);
-    $('#skills').scrollIntoView({ behavior: motionOn ? 'smooth' : 'instant', block: 'start' });
+    $('#careerDialog').close();
+    if (document.body.dataset.page && currentPage !== 'skills') { visitPage('skills', `?skill=${encodeURIComponent(jump.dataset.skillJump)}`); return; }
+    resetSkills(); selectSkill(jump.dataset.skillJump);
     $(`[data-skill="${jump.dataset.skillJump}"]`).focus({ preventScroll: true });
   }
 });
@@ -694,7 +707,16 @@ activityObserver.observe($('#home'));
 measureSections();
 // Every visit starts with the intro, then profile selection. Follow section links after selection.
 const linkedSection = document.getElementById(location.hash.slice(1));
-startIntro();
+if (currentPage === 'home') startIntro();
+else {
+  setProfile(storage.read('portfolio-profile', 'visitor'));
+  hideIntro(); enterApp();
+  const pageParams = new URLSearchParams(window.location.search || '');
+  const project = pageParams.get('project');
+  if (currentPage === 'projects' && projects[project]) requestAnimationFrame(() => showDetail(project));
+  const skill = pageParams.get('skill');
+  if (currentPage === 'skills' && skillList.some(item=>item.id === skill)) selectSkill(skill);
+}
 
 function projectRepository(id) {
   const value = window.portfolioProjectLinks?.[id];
