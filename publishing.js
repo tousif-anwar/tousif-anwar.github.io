@@ -114,7 +114,7 @@
       const card = create('article', undefined, 'walkthrough-card');
       const preview = create('button', undefined, 'walkthrough-preview'); preview.setAttribute('aria-label', `Watch ${video.title}`);
       const poster = safeUrl(video.poster, true);
-      if (poster) { const image = create('img'); image.src = poster; image.alt = ''; image.loading = 'lazy'; image.decoding = 'async'; preview.append(image); }
+      if (poster) { const image = create('img'); image.src = poster; image.alt = ''; image.width = 960; image.height = 540; image.loading = 'lazy'; image.decoding = 'async'; preview.append(image); }
       preview.append(create('span', '▶', 'walkthrough-play'), create('span', video.duration || 'PROJECT WALKTHROUGH', 'walkthrough-duration'));
       preview.addEventListener('click', () => showVideo(video));
       const body = create('div', undefined, 'walkthrough-body'); body.append(create('p', projectLabels[video.project] || 'Project walkthrough', 'overline'), create('h3', video.title), create('p', video.description || 'Explore the project in more detail.'));
@@ -130,7 +130,7 @@
         watch.setAttribute('aria-label', `Watch ${video.title}`);
         const poster = safeUrl(video.poster, true);
         if (poster) {
-          const image = create('img'); image.src = poster; image.alt = ''; image.decoding = 'async';
+          const image = create('img'); image.src = poster; image.alt = ''; image.width = 960; image.height = 540; image.decoding = 'async';
           image.loading = index === 0 ? 'eager' : 'lazy'; watch.append(image);
         }
         watch.append(create('span', '▶', 'walkthrough-play'), create('span', video.duration || 'EXPLAINER', 'walkthrough-duration'));
@@ -178,6 +178,16 @@
     find('#videoPlayer').replaceChildren();
     find('#videoTitle').textContent = video.title;
     find('#videoDescription').textContent = video.description || '';
+    const summary = find('#videoSummary');
+    summary.hidden = !video.summary;
+    summary.open = false;
+    renderBody(find('#videoSummaryBody'), video.summary || '');
+    const caseStudy = find('#videoCaseStudy');
+    caseStudy.hidden = !projectLabels[video.project] || video.project === 'overview';
+    caseStudy.onclick = () => {
+      find('#videoDialog').close();
+      doc.dispatchEvent(new CustomEvent('portfolio:project-detail', { detail: { id: video.project } }));
+    };
     if (source.type === 'file') {
       const player = create('video'); player.src = source.src; player.controls = true; player.preload = 'metadata'; player.playsInline = true;
       player.setAttribute('aria-label', video.title); find('#videoPlayer').append(player);
@@ -185,8 +195,11 @@
       const frame = create('iframe'); frame.src = source.src; frame.title = video.title; frame.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen'; frame.allowFullscreen = true;
       frame.referrerPolicy = 'strict-origin-when-cross-origin'; find('#videoPlayer').append(frame);
     } else {
-      const pane = create('div', undefined, 'external-video'); pane.append(create('p', 'This walkthrough opens on its video host.'));
-      const link = create('a', 'Open video explanation ↗', 'btn btn-white'); link.href = source.src; link.target = '_blank'; link.rel = 'noopener noreferrer'; pane.append(link); find('#videoPlayer').append(pane);
+      const pane = create('div', undefined, 'external-video');
+      const poster = safeUrl(video.poster, true);
+      if (poster) { const image = create('img'); image.src = poster; image.alt = ''; image.width = 960; image.height = 540; image.decoding = 'async'; pane.append(image); }
+      pane.append(create('p', 'Watch the narrated explainer on Scrimba. Opens in a new tab.'));
+      const link = create('a', 'Watch on Scrimba ↗', 'btn btn-white'); link.href = source.src; link.target = '_blank'; link.rel = 'noopener noreferrer'; pane.append(link); find('#videoPlayer').append(pane);
     }
     openDialog(find('#videoDialog'));
   }

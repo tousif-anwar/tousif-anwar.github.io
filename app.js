@@ -317,6 +317,10 @@ function showDetail(id) {
   openDialog($('#detailDialog'));
 }
 
+document.addEventListener('portfolio:project-detail', event => {
+  if (projects[event.detail?.id]) showDetail(event.detail.id);
+});
+
 let currentCareerIndex = 0;
 function createTextElement(tag, text, className) {
   const element = document.createElement(tag); element.textContent = text;
