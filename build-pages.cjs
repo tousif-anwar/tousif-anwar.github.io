@@ -72,6 +72,7 @@ for(const [key,[file,label]] of Object.entries(pages)){
   for(const [id,title] of Object.entries(clearHeadings)){const heading=$(`#${id} h2`);if(heading)heading.textContent=title;}
   const about=$('.about-lead');about.textContent='I build backend and data systems, integrate mobile applications with APIs, and investigate applied machine learning problems. My work connects software delivery with production performance and reliability.';
   for(const asset of document.querySelectorAll('script[src],link[rel="stylesheet"]')){const attr=asset.tagName==='SCRIPT'?'src':'href';asset.setAttribute(attr,asset.getAttribute(attr).split('?')[0]+'?v=cards-menu-20261016');}
+  if(key==='about')$('link[rel="stylesheet"]').href='styles.css?v=about-portrait-20261021';
   const canonical=document.createElement('link');canonical.rel='canonical';canonical.href='https://tousif-anwar.github.io/'+(key==='home'?'':file);document.head.append(canonical);
   fs.writeFileSync(file,key==='videos'?'<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta http-equiv="refresh" content="0;url=projects.html"><link rel="canonical" href="https://tousif-anwar.github.io/projects.html"><title>Project walkthroughs | Tousif Anwar</title></head><body><p>Walkthroughs now appear inside the project cards. <a href="projects.html">View projects and videos</a>.</p></body></html>':document.toString());
 }
